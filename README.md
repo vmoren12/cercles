@@ -25,6 +25,9 @@ Les ruletes es desen al navegador de l'ordinador on fas servir l'aplicació (`lo
 
 Es publica amb GitHub Pages a partir de la branca `main` (carpeta arrel). Cada canvi que s'hi puja s'actualitza automàticament a la web.
 
-## Crèdits
+## Autoria i llicències
 
-Preguntes basades en «Ruletes amb preguntes pels cercles», material elaborat per Ariadna Concernau Vert.
+- **Preguntes:** basades en «Ruletes amb preguntes pels cercles», material elaborat per Ariadna Concernau Vert.
+- **Aplicació:** © 2026 Víctor Moreno de la Torre, psicòleg i orientador educatiu.
+- **Codi:** [MIT](LICENSE).
+- **Continguts:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ca).
