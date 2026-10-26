@@ -67,6 +67,7 @@ button:disabled{cursor:default}
 .credit p{margin:0}
 .credit .author{margin:12px 0 4px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted)}
 .credit .author b{font-weight:500;color:var(--ink)}
+.credit .role{display:block;font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:2px}
 .credit a{color:inherit;text-underline-offset:2px}
 .credit a:hover{color:var(--ink)}
 
@@ -250,10 +251,18 @@ dialog::backdrop{background:rgba(30,34,39,.38);backdrop-filter:blur(2px)}
 
 /* Avís d'emmagatzematge */
 .store-note{position:fixed;right:20px;bottom:20px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-.note-fab{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 15px 9px 11px;font-size:13px;color:var(--ink);box-shadow:0 2px 6px rgba(30,34,39,.08),0 10px 24px rgba(30,34,39,.1);position:relative}
-.note-fab:hover{border-color:#BDB8AE}
+.note-dock{display:flex;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;box-shadow:0 2px 6px rgba(30,34,39,.08),0 10px 24px rgba(30,34,39,.1)}
+.note-dock:hover{border-color:#BDB8AE}
+.note-fab{display:flex;align-items:center;gap:8px;border:0;background:none;border-radius:999px;padding:9px 6px 9px 11px;font-size:13px;color:var(--ink);position:relative}
+.note-min{width:28px;height:28px;margin-right:4px;border:0;border-radius:50%;background:none;color:var(--faint);display:grid;place-items:center}
+.note-min:hover{background:#EFECE5;color:var(--ink)}
+.store-note.mini .note-lbl,.store-note.mini .note-min{display:none}
+.store-note.mini .note-fab{padding:10px}
+.store-note:not(.mini) .note-restore{display:none}
+.note-restore{flex-basis:100%;margin:4px 0 -4px;padding:4px 0;font-size:12.5px}
 .note-fab svg{flex:none;color:var(--theme)}
-.note-fab.unseen::after{content:"";position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:#C26A3C;box-shadow:0 0 0 2px var(--surface)}
+.note-dock{position:relative}
+.note-dock.unseen::after{content:"";position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:#C26A3C;box-shadow:0 0 0 2px var(--surface)}
 .note-panel{position:relative;width:min(340px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 20px 16px;box-shadow:0 20px 50px rgba(20,22,26,.18);animation:pop .2s cubic-bezier(.2,.8,.2,1);transform-origin:100% 100%}
 .note-panel[hidden]{display:none}
 .note-panel h3{margin:0 30px 8px 0;font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.25}
@@ -263,7 +272,20 @@ dialog::backdrop{background:rgba(30,34,39,.38);backdrop-filter:blur(2px)}
 .note-panel .tip{font-size:12.5px;color:var(--muted)}
 .note-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border:0;border-radius:8px;background:none;color:var(--faint);display:grid;place-items:center}
 .note-close:hover{background:#EFECE5;color:var(--ink)}
-.note-actions{display:flex;gap:8px;margin-top:14px}
+.note-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}
+
+/* Exportar */
+.exp-seg{margin:0 0 14px}
+.exp-sum{text-align:center;font-size:13.5px!important;color:var(--ink)!important;margin:0 0 20px!important}
+.exp-sum:empty{display:none}
+.exp-list{display:grid;gap:2px;max-height:44vh;overflow-y:auto;margin:0 0 20px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.exp-list[hidden]{display:none}
+.exp-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer}
+.exp-row:hover{background:var(--paper)}
+.exp-row.sel{background:var(--theme-soft)}
+.exp-row input{margin:0;width:16px;height:16px;accent-color:var(--ink);cursor:pointer}
+.exp-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px}
+.exp-row small{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
 .present .store-note{display:none}
 @media (max-width:760px){.store-note{right:16px;bottom:16px}}
 
@@ -326,8 +348,7 @@ dialog::backdrop{background:rgba(30,34,39,.38);backdrop-filter:blur(2px)}
     <section>
       <p class="label">Dades</p>
       <div class="data-actions">
-        <button class="link" id="btnExport">Exportar totes les ruletes (.json)</button>
-        <button class="link" id="btnExportOne">Exportar només la temàtica actual</button>
+        <button class="link" id="btnExport">Exportar ruletes (.json)</button>
         <button class="link" id="btnImport">Importar ruletes</button>
         <button class="link" id="btnRestore">Restaurar les ruletes originals</button>
         <input type="file" id="fileImport" accept="application/json,.json" hidden>
@@ -336,8 +357,8 @@ dialog::backdrop{background:rgba(30,34,39,.38);backdrop-filter:blur(2px)}
 
     <footer class="credit">
       <p>Preguntes basades en «Ruletes amb preguntes pels cercles», material elaborat per Ariadna Concernau Vert.</p>
-      <p class="author"><b>© 2026 Víctor Moreno de la Torre</b><br>Psicòleg i orientador educatiu</p>
-      <p>Codi: <a href="https://github.com/vmoren12/cercles/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Continguts: <a href="https://creativecommons.org/licenses/by/4.0/deed.ca" target="_blank" rel="noopener">CC BY 4.0</a> · v1.0.0</p>
+      <p class="author"><span class="role">Autoria tècnica de l'aplicació</span><b>© 2026 Víctor Moreno de la Torre</b><br>Psicòleg i orientador educatiu</p>
+      <p>Codi: <a href="https://github.com/vmoren12/cercles/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Continguts: <a href="https://creativecommons.org/licenses/by/4.0/deed.ca" target="_blank" rel="noopener">CC BY 4.0</a> · v1.1.0</p>
     </footer>
   </aside>
 
@@ -474,6 +495,15 @@ dialog::backdrop{background:rgba(30,34,39,.38);backdrop-filter:blur(2px)}
   <div class="ask-foot"><button class="btn" id="dupNo">Cancel·la</button><button class="btn primary" id="dupYes">Importa</button></div>
 </dialog>
 
+<dialog id="expDlg" class="ask dup" aria-labelledby="expTitle">
+  <h3 id="expTitle">Exportar ruletes</h3>
+  <p>Es descarregarà un fitxer que podràs importar en un altre ordinador o guardar com a còpia.</p>
+  <div class="segmented exp-seg" id="expSeg" role="group" aria-label="Què vols exportar"><button type="button" data-x="all">Totes les temàtiques</button><button type="button" data-x="one">Només una</button></div>
+  <p class="exp-sum" id="expSum"></p>
+  <div class="exp-list" id="expList" role="radiogroup" aria-label="Temàtica a exportar"></div>
+  <div class="ask-foot"><button class="btn" id="expNo">Cancel·la</button><button class="btn primary" id="expYes">Exporta</button></div>
+</dialog>
+
 <div class="store-note" id="storeNote">
   <div class="note-panel" id="notePanel" role="dialog" aria-labelledby="noteTitle" hidden>
     <button class="note-close" id="noteClose" aria-label="Tanca"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg></button>
@@ -485,9 +515,12 @@ dialog::backdrop{background:rgba(30,34,39,.38);backdrop-filter:blur(2px)}
       <li>A l'altre ordinador, fes clic a <b>Importar</b> i tria aquest fitxer.</li>
     </ol>
     <p class="tip">Consell: exporta-les de tant en tant per tenir-ne una còpia. Si s'esborren les dades del navegador, també s'esborren les ruletes.</p>
-    <div class="note-actions"><button class="btn primary" id="noteExport">Exportar</button><button class="btn" id="noteImport">Importar</button></div>
+    <div class="note-actions"><button class="btn primary" id="noteExport">Exportar</button><button class="btn" id="noteImport">Importar</button><button class="link note-restore" id="noteRestore">Mostra el text al botó</button></div>
   </div>
-  <button class="note-fab" id="noteFab" aria-expanded="false" aria-controls="notePanel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>On es desen les ruletes?</button>
+  <div class="note-dock" id="noteDock">
+    <button class="note-fab" id="noteFab" aria-expanded="false" aria-controls="notePanel" aria-label="On es desen les ruletes?"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span class="note-lbl">On es desen les ruletes?</span></button>
+    <button class="note-min" id="noteMin" title="Minimitza (deixa només la icona)" aria-label="Minimitza l'avís"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3.5 7h7"/></svg></button>
+  </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -818,8 +851,6 @@ function renderInfo(){
   const w=cur();
   $('#themeTitle').textContent=w?w.name:'Sense temàtiques';
   $('#eyebrow').textContent=w&&w.session?'Preguntes triades per a avui':'Temàtica'+(store.wheels.length>1&&w?` ${store.wheels.indexOf(w)+1} de ${store.wheels.length}`:'');
-  $('#btnExportOne').disabled=!w;
-  $('#btnExportOne').textContent=w?`Exportar només «${w.name}»`:'Exportar només la temàtica actual';
   if(!w){$('#poolInfo').textContent='';return}
   const t=w.questions.length;
   $('#poolInfo').textContent=store.mode==='keep'?`${t} preguntes`:`${candidates(w).length} de ${t} disponibles`;
@@ -1063,7 +1094,7 @@ function togglePresent(){
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('present'))togglePresent()});
 
 document.addEventListener('keydown',e=>{
-  if(dlg.open||$('#ask').open||$('#listDlg').open||$('#sesDlg').open||$('#dupDlg').open)return;
+  if(dlg.open||$('#ask').open||$('#listDlg').open||$('#sesDlg').open||$('#dupDlg').open||expDlg.open)return;
   if(e.key==='Escape'&&!$('#notePanel').hidden){toggleNote(false);$('#noteFab').focus();return}
   const tag=(e.target.tagName||'').toLowerCase();
   if(['input','textarea','select'].includes(tag))return;
@@ -1084,8 +1115,44 @@ function download(wheels,file){
 }
 const slug=s=>norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'tematica';
 function exportOne(w){download([w],`cercles-${slug(w.name)}.json`);toast(`S'ha exportat «${w.name}».`)}
-$('#btnExport').addEventListener('click',()=>download(store.wheels,'cercles-ruletes.json'));
-$('#btnExportOne').addEventListener('click',()=>{const w=cur();if(w)exportOne(w)});
+/* Finestra d'exportació: totes les temàtiques o només una */
+const expDlg=$('#expDlg');
+let expAll=true, expId=null;
+function renderExport(){
+  const ws=store.wheels, n=ws.length;
+  if(!ws.some(w=>w.id===expId))expId=(cur()||ws[0]||{}).id;
+  expDlg.querySelectorAll('#expSeg button').forEach(b=>b.classList.toggle('active',(b.dataset.x==='all')===expAll));
+  $('#expSum').textContent=expAll?(n===1?'S\'exportarà la teva única temàtica.':`S'exportaran les ${n} temàtiques en un sol fitxer.`):'';
+  const list=$('#expList'); list.hidden=expAll; list.innerHTML='';
+  if(!expAll)ws.forEach(w=>{
+    const rb=el('input',{type:'radio',name:'expPick'}); rb.checked=w.id===expId;
+    rb.addEventListener('change',()=>{expId=w.id;renderExport()});
+    list.append(el('label',{class:'exp-row'+(w.id===expId?' sel':'')},rb,
+      el('span',{class:'dot',style:'background:'+w.color}),el('span',{class:'nm'},w.name),
+      el('small',{},w.questions.length===1?'1 pregunta':w.questions.length+' preguntes')));
+  });
+  const one=ws.find(w=>w.id===expId);
+  $('#expYes').textContent=expAll?'Exporta-les totes':one?`Exporta «${one.name}»`:'Exporta';
+  $('#expYes').disabled=!n;
+}
+function openExport(){
+  if(busy)return;
+  if(!store.wheels.length){toast('Encara no hi ha cap temàtica per exportar.');return}
+  expAll=true; expId=store.current; renderExport(); expDlg.showModal(); $('#expYes').focus();
+}
+expDlg.querySelectorAll('#expSeg button').forEach(b=>b.addEventListener('click',()=>{
+  expAll=b.dataset.x==='all'; renderExport();
+  if(!expAll){const s=$('#expList .exp-row.sel');if(s)s.scrollIntoView({block:'nearest'})}
+}));
+$('#expNo').addEventListener('click',()=>expDlg.close());
+expDlg.addEventListener('click',e=>{if(e.target===expDlg)expDlg.close()});
+$('#expYes').addEventListener('click',()=>{
+  const w=store.wheels.find(x=>x.id===expId);
+  expDlg.close();
+  if(expAll){download(store.wheels,'cercles-ruletes.json');toast(`S'han exportat ${store.wheels.length} temàtiques.`)}
+  else if(w)exportOne(w);
+});
+$('#btnExport').addEventListener('click',openExport);
 $('#btnImport').addEventListener('click',()=>$('#fileImport').click());
 
 /* Temàtiques importades amb el mateix nom que una d'existent: conservar, substituir o tenir-les totes dues */
@@ -1168,16 +1235,26 @@ $('#fileImport').addEventListener('change',e=>{
 });
 
 /* Avís flotant: on es desen les dades */
-const NOTE_KEY='cercles.avis.vist';
+const NOTE_KEY='cercles.avis.vist', MINI_KEY='cercles.avis.mini';
 function toggleNote(open){
   const p=$('#notePanel'), fab=$('#noteFab');
   p.hidden=!open; fab.setAttribute('aria-expanded',String(open));
-  if(open){fab.classList.remove('unseen');try{localStorage.setItem(NOTE_KEY,'1')}catch(e){}}
+  if(open){$('#noteDock').classList.remove('unseen');try{localStorage.setItem(NOTE_KEY,'1')}catch(e){}}
 }
-try{if(!localStorage.getItem(NOTE_KEY))$('#noteFab').classList.add('unseen')}catch(e){}
+function setMini(on){
+  $('#storeNote').classList.toggle('mini',on);
+  $('#noteFab').title=on?'On es desen les ruletes?':'';
+  try{on?localStorage.setItem(MINI_KEY,'1'):localStorage.removeItem(MINI_KEY)}catch(e){}
+}
+try{
+  if(!localStorage.getItem(NOTE_KEY))$('#noteDock').classList.add('unseen');
+  if(localStorage.getItem(MINI_KEY))setMini(true);
+}catch(e){}
 $('#noteFab').addEventListener('click',()=>toggleNote($('#notePanel').hidden));
+$('#noteMin').addEventListener('click',()=>{toggleNote(false);setMini(true);$('#noteFab').focus()});
+$('#noteRestore').addEventListener('click',()=>{setMini(false);toggleNote(false);$('#noteFab').focus()});
 $('#noteClose').addEventListener('click',()=>{toggleNote(false);$('#noteFab').focus()});
-$('#noteExport').addEventListener('click',()=>{toggleNote(false);$('#btnExport').click()});
+$('#noteExport').addEventListener('click',()=>{toggleNote(false);openExport()});
 $('#noteImport').addEventListener('click',()=>{toggleNote(false);$('#btnImport').click()});
 document.addEventListener('click',e=>{if(!$('#notePanel').hidden&&!$('#storeNote').contains(e.target))toggleNote(false)});
 $('#btnRestore').addEventListener('click',async()=>{

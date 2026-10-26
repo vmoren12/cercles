@@ -11,7 +11,7 @@ Ruletes de preguntes per a dinàmiques de cercle a l'aula.
 - **Temàtiques editables**: crea, duplica, canvia el color o enganxa una llista de preguntes.
 - **Preparar sessió**: tria preguntes de diverses temàtiques (o sorteja-les) per a la sessió del dia.
 - **Mode projecció** a pantalla completa per a la pissarra digital.
-- **Exportar i importar** en format `.json`: totes les temàtiques o només una. En importar, si ja hi ha una temàtica amb el mateix nom, pots triar si conserves la teva, la substitueixes o les mantens totes dues.
+- **Exportar i importar** en format `.json`: en exportar, tries si vols totes les temàtiques o només una (i quina). En importar, si ja hi ha una temàtica amb el mateix nom, pots triar si conserves la teva, la substitueixes o les mantens totes dues.
 
 ## On es desen les dades
 
@@ -28,6 +28,6 @@ Es publica amb GitHub Pages a partir de la branca `main` (carpeta arrel). Cada c
 ## Autoria i llicències
 
 - **Preguntes:** basades en «Ruletes amb preguntes pels cercles», material elaborat per Ariadna Concernau Vert.
-- **Aplicació:** © 2026 Víctor Moreno de la Torre, psicòleg i orientador educatiu.
+- **Autoria tècnica de l'aplicació:** © 2026 Víctor Moreno de la Torre, psicòleg i orientador educatiu.
 - **Codi:** [MIT](LICENSE).
 - **Continguts:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ca).
