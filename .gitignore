@@ -1,0 +1,12 @@
+# Sistema operatiu
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Exportacions locals de prova
+cercles-*.json

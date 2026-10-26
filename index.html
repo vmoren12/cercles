@@ -1,0 +1,1189 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cercles · Ruletes de preguntes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F4EF; --side:#EFECE5; --surface:#FFFFFF; --ink:#1E2227; --muted:#6A6E75; --faint:#9EA1A6;
+  --line:#E2DED5; --theme:#3E6E8E; --theme-soft:#E6EDF2;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif; --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default}
+:focus-visible{outline:2px solid var(--theme);outline-offset:2px}
+
+.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+
+/* ---------- Barra lateral ---------- */
+.side{background:var(--side);border-right:1px solid var(--line);padding:28px 20px 24px;display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{padding:0 6px}
+.brand-name{font-family:var(--serif);font-size:28px;line-height:1;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.brand-mark{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--ink);position:relative}
+.brand-mark::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--theme);transition:background .3s}
+.brand-sub{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.4}
+.label{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 6px 10px}
+
+.themes{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.theme-btn{width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid transparent;border-radius:10px;background:none;text-align:left}
+.theme-btn:hover{background:rgba(255,255,255,.55)}
+.theme-btn.active{background:var(--surface);border-color:var(--line)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.theme-btn .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.theme-btn .ct{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums;transition:opacity .15s}
+.themes li{position:relative}
+.theme-del{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:0;border-radius:8px;background:none;color:var(--faint);display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .15s,background .15s,color .15s}
+.themes li:hover .theme-del,.theme-del:focus-visible{opacity:1;pointer-events:auto}
+.themes li:hover .ct,.themes li:focus-within .ct{opacity:0}
+.theme-del:hover{background:#F3E3E0;color:#A8473E}
+@media (hover:none){.theme-del{opacity:1;pointer-events:auto}.themes .ct{opacity:0}}
+.ghost{background:none;border:1px dashed #CFCAC0;border-radius:10px;padding:8px 10px;width:100%;text-align:left;color:var(--muted);margin-top:6px}
+.ghost:hover{border-color:var(--ink);color:var(--ink)}
+
+.options{display:grid;gap:6px}
+.opt{display:block;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:10px;padding:9px 12px 9px 30px;position:relative}
+.opt::before{content:"";position:absolute;left:11px;top:14px;width:9px;height:9px;border-radius:50%;border:1.5px solid #B9B4AA}
+.opt:hover{background:rgba(255,255,255,.55)}
+.opt.active{background:var(--surface);border-color:var(--line)}
+.opt.active::before{border-color:var(--theme);background:var(--theme)}
+.opt b{display:block;font-weight:500;font-size:14px}
+.opt small{display:block;color:var(--muted);font-size:12px;line-height:1.35;margin-top:1px}
+
+.segmented{display:grid;grid-template-columns:repeat(2,1fr);background:#E5E1D9;border-radius:10px;padding:3px;gap:3px}
+.segmented button{border:0;background:none;border-radius:8px;padding:7px 4px;font-size:13px;color:var(--muted)}
+.segmented button.active{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+
+.data-actions{display:grid;gap:4px}
+.link{background:none;border:0;text-align:left;padding:6px;color:var(--muted);font-size:13px;border-radius:6px}
+.link:hover{color:var(--ink);background:rgba(255,255,255,.55)}
+.credit{margin-top:auto;font-size:11.5px;line-height:1.45;color:var(--faint);padding:0 6px}
+
+/* ---------- Escenari ---------- */
+.stage{padding:32px 44px 48px;min-width:0}
+.stage-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:34px}
+.eyebrow{margin:0 0 4px;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--theme)}
+h1{margin:0;font-family:var(--serif);font-weight:400;font-size:38px;line-height:1.1;letter-spacing:-.015em}
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.info{font-size:13px;color:var(--muted);margin-right:6px;font-variant-numeric:tabular-nums}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 15px;font-size:13px}
+.btn:hover{border-color:#BDB8AE}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.primary:hover{background:#000}
+.btn:disabled{opacity:.45}
+
+.stage-body{display:grid;grid-template-columns:minmax(280px,500px) minmax(0,1fr);gap:52px;align-items:start}
+
+/* Ruleta */
+.wheel-box{position:relative;width:100%;aspect-ratio:1}
+#wheel{display:block;width:100%;height:100%}
+.pointer{position:absolute;left:50%;top:-10px;width:22px;height:26px;margin-left:-11px;background:var(--ink);clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:50% 0;z-index:2}
+.pointer.tick{animation:tick .09s ease-out}
+@keyframes tick{50%{transform:rotate(-9deg)}}
+.hub{position:absolute;left:50%;top:50%;width:24%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:var(--surface);border:1px solid var(--line);box-shadow:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(30,34,39,.08);font-family:var(--serif);font-size:clamp(17px,2vw,22px);transition:border-color .2s,transform .15s}
+.hub:hover:not(:disabled){border-color:var(--theme)}
+.hub:active:not(:disabled){transform:translate(-50%,-50%) scale(.97)}
+.hub:disabled{color:var(--faint)}
+
+/* Targetes */
+.cards-view{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px}
+
+/* Targetes */
+.cards-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+.cards-top p{margin:0;color:var(--muted);font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:10px}
+.card{aspect-ratio:3/4;border:0;padding:0;background:none;perspective:600px}
+.card-inner{display:block;position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d}
+.card.flipped .card-inner{transform:rotateY(180deg)}
+.card-back,.card-front{position:absolute;inset:0;border-radius:10px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid;place-items:center}
+.card-back{background:var(--theme-soft);border:1px solid var(--line);background-image:repeating-linear-gradient(45deg,transparent 0 6px,rgba(255,255,255,.55) 6px 7px)}
+.card:hover:not(:disabled) .card-back{border-color:var(--theme)}
+.card-front{background:var(--surface);border:1px solid var(--line);transform:rotateY(180deg);font-family:var(--serif);font-size:26px;color:var(--theme)}
+.card.current .card-front{border-color:var(--theme);box-shadow:0 0 0 2px var(--theme)}
+.card.done{opacity:.4}
+.card.gone{border:1px dashed var(--line);border-radius:10px}
+
+/* Pregunta */
+.result{display:grid;gap:22px;min-width:0}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:34px 36px 36px;position:relative;overflow:hidden;min-height:250px;display:flex;flex-direction:column}
+.qcard::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--theme);transition:background .3s}
+.qmeta{margin:0 0 18px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:baseline}
+.qnum{font-family:var(--serif);font-size:44px;line-height:.8;letter-spacing:0;text-transform:none;color:var(--theme)}
+.qtext{margin:0;font-family:var(--serif);font-size:clamp(24px,2.5vw,32px);line-height:1.25;letter-spacing:-.005em;text-wrap:pretty}
+.qtext.placeholder{color:var(--faint);font-style:italic}
+.qtext.notice{font-size:20px;color:var(--muted)}
+.qcard.reveal .qtext,.qcard.reveal .qmeta{animation:rise .5s cubic-bezier(.2,.7,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.numpick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.numpick input{width:76px;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font:inherit;background:var(--surface);color:var(--ink);text-align:center}
+.numpick input:focus{outline:none;border-color:var(--theme)}
+
+.history-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.history-head .label{margin:0}
+.history{list-style:none;margin:0;padding:0;max-height:260px;overflow-y:auto;border-top:1px solid var(--line)}
+.history li{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;color:#3A3E44}
+.history .hn{font-family:var(--serif);font-size:18px;line-height:1.2}
+.history .ht{font-size:11px;color:var(--faint);display:block;letter-spacing:.04em;text-transform:uppercase}
+.history .empty{display:block;color:var(--faint);font-style:italic;border:0}
+
+/* ---------- Editor ---------- */
+dialog{border:0;border-radius:18px;padding:0;width:min(760px,94vw);max-height:88vh;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(20,22,26,.25)}
+dialog::backdrop{background:rgba(30,34,39,.38);backdrop-filter:blur(2px)}
+.ed{display:flex;flex-direction:column;max-height:88vh}
+.ed-head{padding:24px 28px 18px;border-bottom:1px solid var(--line);display:grid;gap:16px}
+.ed-row{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
+.field{display:grid;gap:6px;flex:1;min-width:220px}
+.field span,.sw-label{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.field input{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;font-family:var(--serif);font-size:22px;color:var(--ink)}
+.field input:focus{outline:none;border-color:var(--theme)}
+.swatches{display:flex;gap:7px;margin-top:6px}
+.sw{width:24px;height:24px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 2px var(--paper)}
+.sw.active{border-color:var(--ink)}
+.ed-body{overflow-y:auto;padding:12px 28px 20px}
+.q-row{display:grid;grid-template-columns:30px 1fr 30px;gap:8px;align-items:start;padding:4px 0}
+.q-row .n{font-family:var(--serif);font-size:17px;color:var(--faint);padding-top:8px;text-align:right}
+.q-row textarea{width:100%;resize:none;border:1px solid transparent;background:transparent;border-radius:8px;padding:8px 10px;font:inherit;font-size:15px;color:var(--ink);line-height:1.4;overflow:hidden}
+.q-row textarea:hover{border-color:var(--line);background:var(--surface)}
+.q-row textarea:focus{outline:none;border-color:var(--theme);background:var(--surface)}
+.icon-btn{width:30px;height:30px;margin-top:5px;border:0;background:none;border-radius:8px;color:var(--faint);display:grid;place-items:center}
+.icon-btn:hover{background:#E8E4DC;color:#A8534B}
+.empty-q{color:var(--faint);font-style:italic;padding:14px 0}
+.ed-add{display:flex;gap:8px;margin:10px 0 0 38px}
+.bulk{margin:20px 0 0 38px;display:grid;gap:8px}
+.bulk textarea{width:100%;min-height:90px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;resize:vertical}
+.bulk textarea:focus{outline:none;border-color:var(--theme)}
+.bulk .sw-label{display:block}
+.ed-foot{padding:16px 28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.btn.danger{color:#9B4038}
+.btn.danger:hover{border-color:#9B4038}
+
+/* Sessió */
+.session-btn{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:10px;border:1px solid var(--ink);border-radius:10px;background:var(--ink);color:#fff;text-align:left;font-weight:500}
+.session-btn:hover{background:#000}
+.session-btn svg{flex:none}
+.dot.ring{background:none!important;border:2px solid var(--ink)}
+.ses{width:min(860px,95vw)}
+.ses-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.ses-bar input[type=number]{width:62px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font:inherit;text-align:center;background:var(--surface);color:var(--ink)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;flex-basis:100%;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:12.5px;color:var(--muted)}
+.chip.on{border-color:var(--ink);color:var(--ink)}
+.chip:not(.on) .dot{opacity:.35}
+.ses-group{margin:6px 0 14px}
+.ses-gh{display:flex;align-items:center;gap:10px;padding:12px 12px 8px;position:sticky;top:-8px;background:var(--paper);z-index:1}
+.ses-gh b{font-family:var(--serif);font-weight:500;font-size:18px;flex:1}
+.ses-gh small{color:var(--faint);font-size:12px;font-variant-numeric:tabular-nums}
+.ses-row{display:grid;grid-template-columns:22px 1fr auto;gap:12px;align-items:start;padding:9px 12px;border-radius:10px;cursor:pointer;border:1px solid transparent}
+.ses-row:hover{background:var(--surface);border-color:var(--line)}
+.ses-row input{margin:3px 0 0;width:17px;height:17px;accent-color:var(--ink);cursor:pointer}
+.ses-row span{font-size:15px;line-height:1.4}
+.ses-row .ord{font-family:var(--serif);font-size:16px;color:var(--ink);min-width:22px;text-align:right}
+.ses-row.sel{background:var(--surface);border-color:var(--line)}
+.ses-foot-info{font-size:14px;color:var(--ink)}
+.ses-foot-info b{font-family:var(--serif);font-size:22px;font-weight:500}
+
+/* Llista de preguntes */
+.lst-head{padding:24px 28px 16px;border-bottom:1px solid var(--line);display:grid;gap:14px}
+.lst-title{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.lst-title h2{margin:0;font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.15}
+.lst-title small{color:var(--muted);font-size:13px}
+.lst-search{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 16px;font:inherit;font-size:14px;color:var(--ink);width:100%}
+.lst-search:focus{outline:none;border-color:var(--theme)}
+.lst-body{overflow-y:auto;padding:8px 16px 16px}
+.lst{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.lst-item{width:100%;display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:baseline;text-align:left;background:none;border:1px solid transparent;border-radius:12px;padding:11px 12px}
+.lst-item:hover:not(:disabled){background:var(--surface);border-color:var(--line)}
+.lst-item:hover:not(:disabled) .lst-n{color:var(--theme)}
+.lst-n{font-family:var(--serif);font-size:22px;line-height:1;color:var(--faint);text-align:right;transition:color .15s}
+.lst-t{font-family:var(--serif);font-size:18px;line-height:1.35}
+.lst-tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
+.lst-item:disabled .lst-t{color:var(--faint);text-decoration:line-through;text-decoration-color:#CFCAC0}
+.lst-item.current{background:var(--theme-soft)}
+.lst-item.current .lst-n{color:var(--theme)}
+.lst-item.current .lst-t{color:var(--ink);text-decoration:none}
+.lst-item.current .lst-tag{color:var(--theme)}
+.lst-foot{padding:14px 28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.present #listDlg .lst-t{font-size:22px}
+
+.ask{width:min(380px,92vw);padding:28px 24px 20px;border-radius:20px;text-align:center}
+.ask[open]{animation:pop .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.ask-icon{width:52px;height:52px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;background:#F3E3E0;color:#A8473E}
+.ask-icon[hidden]{display:none}
+.ask h3{margin:0 0 8px;font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.25}
+.ask p{margin:0 0 22px;color:var(--muted);font-size:14px;line-height:1.45}
+.ask p:empty{display:none}
+.ask-foot{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ask-foot .btn{padding:11px 14px;font-size:14px;font-weight:500}
+.btn.destroy{background:#A8473E;border-color:#A8473E;color:#fff}
+.btn.destroy:hover{background:#8F3A32;border-color:#8F3A32}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,12px);background:var(--ink);color:#fff;font-size:13px;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:90vw;text-align:center;display:flex;align-items:center;gap:14px}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.show.has-action{pointer-events:auto}
+.toast button{background:none;border:0;color:#F2C9A0;font-weight:600;font-size:13px;padding:2px 4px;border-radius:6px}
+.toast button:hover{color:#fff}
+
+/* Conflictes d'importació */
+.dup{width:min(520px,94vw);text-align:left}
+.dup h3,.dup>p{text-align:center}
+.dup>p{margin-bottom:16px}
+.dup-all{display:flex;justify-content:center;gap:4px;margin:-6px 0 10px;font-size:12.5px}
+.dup-all[hidden]{display:none}
+.dup-list{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:8px;max-height:46vh;overflow-y:auto}
+.dup-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:10px}
+.dup-name{display:flex;align-items:center;gap:8px;font-family:var(--serif);font-size:18px;line-height:1.2}
+.dup-name small{margin-left:auto;font-family:var(--sans);font-size:12px;color:var(--faint);white-space:nowrap;font-variant-numeric:tabular-nums}
+.dup-item .segmented{grid-template-columns:repeat(3,1fr)}
+.dup-item .segmented button{font-size:12.5px;line-height:1.25}
+
+/* Avís d'emmagatzematge */
+.store-note{position:fixed;right:20px;bottom:20px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.note-fab{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 15px 9px 11px;font-size:13px;color:var(--ink);box-shadow:0 2px 6px rgba(30,34,39,.08),0 10px 24px rgba(30,34,39,.1);position:relative}
+.note-fab:hover{border-color:#BDB8AE}
+.note-fab svg{flex:none;color:var(--theme)}
+.note-fab.unseen::after{content:"";position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:#C26A3C;box-shadow:0 0 0 2px var(--surface)}
+.note-panel{position:relative;width:min(340px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 20px 16px;box-shadow:0 20px 50px rgba(20,22,26,.18);animation:pop .2s cubic-bezier(.2,.8,.2,1);transform-origin:100% 100%}
+.note-panel[hidden]{display:none}
+.note-panel h3{margin:0 30px 8px 0;font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.25}
+.note-panel p{margin:0 0 10px;font-size:13.5px;line-height:1.5;color:#3A3E44}
+.note-panel ol{margin:0 0 10px;padding-left:20px;font-size:13.5px;line-height:1.5;color:#3A3E44}
+.note-panel li+li{margin-top:4px}
+.note-panel .tip{font-size:12.5px;color:var(--muted)}
+.note-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border:0;border-radius:8px;background:none;color:var(--faint);display:grid;place-items:center}
+.note-close:hover{background:#EFECE5;color:var(--ink)}
+.note-actions{display:flex;gap:8px;margin-top:14px}
+.present .store-note{display:none}
+@media (max-width:760px){.store-note{right:16px;bottom:16px}}
+
+/* ---------- Projecció ---------- */
+.present .app{grid-template-columns:1fr}
+.present .side,.present .tools .hide-present,.present .numpick,.present .history-wrap{display:none}
+.present .stage{padding:32px 6vw}
+.present .stage-body{grid-template-columns:minmax(300px,44vw) 1fr;align-items:center;min-height:calc(100vh - 160px)}
+.present .qtext{font-size:clamp(30px,3.4vw,52px)}
+.present .qcard{min-height:340px;padding:44px 48px}
+
+@media (max-width:980px){
+  .stage-body{grid-template-columns:1fr;gap:32px}
+  .wheel-box{max-width:460px;margin:0 auto}
+  .present .stage-body{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .stage{padding:24px 16px 40px}
+  h1{font-size:30px}
+  .qcard{padding:28px 22px}
+  .credit{margin-top:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="brand-name"><span class="brand-mark"></span>Cercles</div>
+      <p class="brand-sub">Ruletes de preguntes per a dinàmiques de cercle a l'aula</p>
+    </div>
+
+    <section>
+      <button class="session-btn" id="btnSession"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>Preparar sessió</button>
+      <p class="label">Temàtiques</p>
+      <ul class="themes" id="themeList"></ul>
+      <button class="ghost" id="addTheme">+ Nova temàtica</button>
+    </section>
+
+    <section>
+      <p class="label">Mètode</p>
+      <div class="segmented" id="methodSeg">
+        <button data-m="wheel">Ruleta</button>
+        <button data-m="cards">Targetes</button>
+      </div>
+    </section>
+
+    <section>
+      <p class="label">Mode de tria</p>
+      <div class="options" id="modeOpts">
+        <button class="opt" data-mode="keep"><b>Amb repetició</b><small>Totes les preguntes poden tornar a sortir</small></button>
+        <button class="opt" data-mode="remove"><b>Eliminar la triada</b><small>La pregunta desapareix de la ruleta</small></button>
+        <button class="opt" data-mode="mark"><b>Marcar com a feta</b><small>Queda en gris i no torna a sortir</small></button>
+      </div>
+    </section>
+
+    <section>
+      <p class="label">Dades</p>
+      <div class="data-actions">
+        <button class="link" id="btnExport">Exportar totes les ruletes (.json)</button>
+        <button class="link" id="btnExportOne">Exportar només la temàtica actual</button>
+        <button class="link" id="btnImport">Importar ruletes</button>
+        <button class="link" id="btnRestore">Restaurar les ruletes originals</button>
+        <input type="file" id="fileImport" accept="application/json,.json" hidden>
+      </div>
+    </section>
+
+    <p class="credit">Preguntes basades en «Ruletes amb preguntes pels cercles», material elaborat per Ariadna Concernau Vert.</p>
+  </aside>
+
+  <main class="stage">
+    <header class="stage-head">
+      <div>
+        <p class="eyebrow" id="eyebrow">Temàtica</p>
+        <h1 id="themeTitle">—</h1>
+      </div>
+      <div class="tools">
+        <span class="info" id="poolInfo"></span>
+        <button class="btn hide-present" id="btnReset">Reiniciar ronda</button>
+        <button class="btn hide-present" id="btnEdit">Editar preguntes</button>
+        <button class="btn" id="btnList" title="Tecla L">Llista de preguntes</button>
+        <button class="btn" id="btnPresent">Mode projecció</button>
+      </div>
+    </header>
+
+    <div class="stage-body">
+      <section class="picker">
+        <div id="wheelView">
+          <div class="wheel-box" id="wheelBox">
+            <div class="pointer" id="pointer"></div>
+            <canvas id="wheel" aria-label="Ruleta de preguntes"></canvas>
+            <button class="hub" id="spinBtn">Gira</button>
+          </div>
+        </div>
+
+        <div id="cardsView" class="cards-view" hidden>
+          <div class="cards-top">
+            <p>Cada targeta amaga un número. Algú en tria una.</p>
+            <button class="btn" id="shuffleBtn">Barrejar</button>
+          </div>
+          <div class="cards" id="cards"></div>
+        </div>
+      </section>
+
+      <section class="result">
+        <article class="qcard" id="qcard" aria-live="polite">
+          <p class="qmeta" id="qmeta"></p>
+          <p class="qtext placeholder" id="qtext"></p>
+        </article>
+
+        <div class="numpick">
+          <label for="numInput">Algú diu un número:</label>
+          <input type="text" id="numInput" inputmode="numeric" autocomplete="off" aria-label="Número de pregunta">
+          <button class="btn" type="button" id="numBtn">Mostra la pregunta</button>
+        </div>
+
+        <div class="history-wrap">
+          <div class="history-head">
+            <p class="label">Han sortit</p>
+            <button class="link" id="clearHist">Netejar</button>
+          </div>
+          <ol class="history" id="history"></ol>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<dialog id="editor">
+  <div class="ed">
+    <div class="ed-head">
+      <div class="ed-row">
+        <label class="field"><span>Nom de la temàtica</span><input id="edName" type="text" autocomplete="off"></label>
+        <div><span class="sw-label">Color</span><div class="swatches" id="swatches"></div></div>
+      </div>
+    </div>
+    <div class="ed-body">
+      <p class="label" style="margin:10px 0 6px 38px" id="edCount">Preguntes</p>
+      <div id="qList"></div>
+      <div class="ed-add"><button class="btn" id="addQ">+ Afegir pregunta</button></div>
+      <div class="bulk">
+        <span class="sw-label">Afegir-ne diverses (una per línia)</span>
+        <textarea id="bulkText" placeholder="Enganxa aquí una llista de preguntes"></textarea>
+        <div><button class="btn" id="bulkAdd">Afegir a la ruleta</button></div>
+      </div>
+    </div>
+    <div class="ed-foot">
+      <div class="tools">
+        <button class="btn danger" id="delTheme">Eliminar temàtica</button>
+        <button class="btn" id="dupTheme">Duplicar</button>
+        <button class="btn" id="expTheme">Exportar</button>
+      </div>
+      <button class="btn primary" id="closeEd">Fet</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="sesDlg" class="ses">
+  <div class="ed">
+    <div class="lst-head">
+      <div class="lst-title"><h2>Preparar la sessió</h2><small>Tria les preguntes que vols treballar avui</small></div>
+      <input class="lst-search" id="sesSearch" type="search" placeholder="Cerca entre totes les preguntes" autocomplete="off" aria-label="Cerca">
+      <div class="ses-bar">
+        <span>Afegeix</span><input type="number" id="sesN" min="1" value="5" aria-label="Quantitat">
+        <span>preguntes a l'atzar de les temàtiques marcades</span>
+        <button class="btn" id="sesRandom">Sorteja</button>
+        <button class="link" id="sesClear" style="margin-left:auto">Treu-les totes</button>
+        <div class="chips" id="sesChips"></div>
+      </div>
+    </div>
+    <div class="lst-body" id="sesBody"></div>
+    <div class="lst-foot">
+      <span class="ses-foot-info" id="sesInfo"></span>
+      <div class="tools"><button class="btn" id="sesCancel">Cancel·la</button><button class="btn primary" id="sesGo">Comença la sessió</button></div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="listDlg">
+  <div class="ed">
+    <div class="lst-head">
+      <div class="lst-title"><h2 id="lstTitle">Preguntes</h2><small id="lstInfo"></small></div>
+      <input class="lst-search" id="lstSearch" type="search" placeholder="Cerca una pregunta o escriu-ne el número" autocomplete="off" aria-label="Cerca">
+    </div>
+    <div class="lst-body"><ul class="lst" id="lst"></ul></div>
+    <div class="lst-foot"><span>Fes clic en una pregunta per mostrar-la.</span><button class="btn primary" id="lstClose">Tanca</button></div>
+  </div>
+</dialog>
+
+<dialog id="ask" class="ask" aria-labelledby="askTitle" aria-describedby="askText">
+  <div class="ask-icon" id="askIcon" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></div>
+  <h3 id="askTitle"></h3>
+  <p id="askText"></p>
+  <div class="ask-foot"><button class="btn" id="askNo">Cancel·la</button><button class="btn primary" id="askYes">D'acord</button></div>
+</dialog>
+<dialog id="dupDlg" class="ask dup" aria-labelledby="dupTitle">
+  <h3 id="dupTitle"></h3>
+  <p>Tria què vols fer amb cadascuna.</p>
+  <div class="dup-all" id="dupAll"><button class="link" data-all="keep">Conserva-les totes</button><button class="link" data-all="replace">Substitueix-les totes</button></div>
+  <ul class="dup-list" id="dupList"></ul>
+  <div class="ask-foot"><button class="btn" id="dupNo">Cancel·la</button><button class="btn primary" id="dupYes">Importa</button></div>
+</dialog>
+
+<div class="store-note" id="storeNote">
+  <div class="note-panel" id="notePanel" role="dialog" aria-labelledby="noteTitle" hidden>
+    <button class="note-close" id="noteClose" aria-label="Tanca"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg></button>
+    <h3 id="noteTitle">Les ruletes es guarden en aquest ordinador</h3>
+    <p>Tot el que crees o canvies es desa automàticament, però només en aquest navegador i en aquest ordinador. Si obres Cercles en un altre ordinador, no hi trobaràs els teus canvis.</p>
+    <p>Per portar-les a un altre lloc:</p>
+    <ol>
+      <li>Aquí, fes clic a <b>Exportar</b>: es descarregarà un fitxer.</li>
+      <li>A l'altre ordinador, fes clic a <b>Importar</b> i tria aquest fitxer.</li>
+    </ol>
+    <p class="tip">Consell: exporta-les de tant en tant per tenir-ne una còpia. Si s'esborren les dades del navegador, també s'esborren les ruletes.</p>
+    <div class="note-actions"><button class="btn primary" id="noteExport">Exportar</button><button class="btn" id="noteImport">Importar</button></div>
+  </div>
+  <button class="note-fab" id="noteFab" aria-expanded="false" aria-controls="notePanel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>On es desen les ruletes?</button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+const PALETTE=['#3E6E8E','#7A5C8E','#4F7F5F','#B07A2A','#A8534B','#4A7480','#8C6A4E','#5B5F8F'];
+
+const RAW=[
+ {name:'Coneixement',color:'#3E6E8E',qs:[
+  "Quines tres coses t'emportaries a una illa deserta?",
+  "Si haguessis de ser una altra persona per un dia, qui series? Per què?",
+  "Si poguessis viure a qualsevol lloc del món, on viuries? Per què?",
+  "Què és el més arriscat o atrevit que has fet?",
+  "Què et fa riure?",
+  "En quin moment de la història t'hauria agradat néixer? Per què?",
+  "Quin seria el títol de la pel·lícula sobre la teva vida?",
+  "Digues un regal que hagis rebut que t'hagi fet emocionar.",
+  "Si tinguessis una màquina del temps, a quina etapa de la teva vida t'agradaria anar? Per què?",
+  "Si el silenci tingués un so, quin so li donaries?",
+  "Explica una tradició familiar o cultural que t'agradi molt.",
+  "Què faries si fossis invisible?",
+  "Quin és el teu postre preferit?",
+  "Quin és el teu plat preferit?",
+  "Quina és la teva rutina de cada matí?",
+  "Si el teu barri fos del joc dels Sims, què hi afegiries? Què hi canviaries?",
+  "Què saps de per què et van posar aquest nom? Té alguna història?",
+  "Quina és la cançó que estàs escoltant més últimament?",
+  "Quina persona és un model a seguir per a tu? Per què?",
+  "Si poguessis tenir un superpoder, quin t'agradaria tenir? Per què?"]},
+ {name:'Autoconeixement',color:'#7A5C8E',qs:[
+  "Quina petita cosa et proposes per aquesta setmana?",
+  "Quina cosa t'ha costat molt de fer i, quan l'has feta, t'has sentit orgullós o orgullosa?",
+  "En quin lloc sents felicitat?",
+  "Com seria el teu dia ideal?",
+  "Què fas per sentir-te en pau, en calma?",
+  "Quina passió tens?",
+  "Si poguessis canviar alguna cosa del teu passat, què canviaries?",
+  "D'aquí a deu anys, com t'imagines la teva vida?",
+  "Si fossis president o presidenta per un dia, què canviaries?",
+  "Si fossis un animal, quin series i per què?",
+  "Què t'agrada fer en les teves estones lliures?",
+  "Quina és la teva fortalesa?",
+  "Si tinguessis una làmpada màgica, quins tres desitjos demanaries?",
+  "Quina és la teva motivació per al dia d'avui?",
+  "Què faries avui si sabessis que no t'equivocaràs?",
+  "Si fossis algú de la teva família, què diries de tu mateix o mateixa?",
+  "Quan t'enfades, com t'agradaria que t'ajudessin les altres persones?",
+  "Quina habilitat t'agradaria desenvolupar més?",
+  "Què és el que més t'agrada del teu caràcter?",
+  "Quin és el teu major somni de vida?"]},
+ {name:'Relacionar-se',color:'#4F7F5F',qs:[
+  "Què és el que més admires d'una persona?",
+  "Explica un record bonic amb el teu grup.",
+  "Com creus que et veuen els companys i les companyes de classe?",
+  "Com t'agrada que siguin les teves amistats?",
+  "Què podries fer tu per ajudar a millorar la convivència a l'aula?",
+  "Què és el que més valores dels teus companys i companyes?",
+  "Descriu com seria un grup classe que et fes sentir seguretat i confiança.",
+  "A qui t'agradaria conèixer una mica més del grup?",
+  "Quan passes per una situació difícil, què necessites dels teus companys i companyes?",
+  "Quina qualitat teva pots aportar al grup?",
+  "Explica alguna cosa que t'hagi ensenyat algú del grup.",
+  "Què t'agradaria agrair al grup?",
+  "Si demà fos l'últim dia que veiessis les persones del teu grup, què t'agradaria dir-los?",
+  "Si poguessis regalar a algú una qualitat teva, quina seria?",
+  "Com actues quan algú falta al respecte a una persona del grup? Què t'agradaria fer diferent?",
+  "Una cosa que hem de canviar i que ens ajudaria a ser un grup més unit és…",
+  "Explica una situació en què un company o una companya t'hagi ajudat.",
+  "Què és el que més t'agrada de les teves amistats del grup?",
+  "Què pots fer tu perquè el grup estigui més unit?",
+  "Com t'agradaria que actués el grup si algú et falta al respecte?"]},
+ {name:'Àmbit educatiu',color:'#B07A2A',qs:[
+  "Quina és la teva assignatura preferida?",
+  "Què t'agrada de l'hora del pati?",
+  "Què t'agrada de la teva escola?",
+  "Si fossis de l'equip directiu de l'escola per un dia, què canviaries?",
+  "Aprenc millor quan…",
+  "Com t'agrada que et reconeguin l'esforç?",
+  "Quin ambient de classe t'ajuda més a aprendre?",
+  "Què sents quan no saps fer una cosa? Com et poden ajudar?",
+  "Què se't dona molt bé i podries ajudar-hi els companys i companyes?",
+  "Què t'ajuda a participar més a classe?",
+  "Com creus que és la teva participació a classe?",
+  "Què no t'agrada que et diguin quan t'equivoques?",
+  "De quins temes t'interessa aprendre més?",
+  "Què canviaries de la classe?",
+  "Una cosa en què necessitaria ajuda és…",
+  "Què has après aquesta setmana o avui?",
+  "Una activitat que fem a l'aula i que m'agrada molt és…",
+  "La setmana que ve m'agradaria millorar en…",
+  "Gràcies que em vaig equivocar en…, ara he après que…",
+  "Què t'agrada de la teva classe?"]},
+ {name:'Emocions i sentiments',color:'#A8534B',qs:[
+  "Digues una cosa que t'hagi fet sentir feliç aquests últims dies.",
+  "Digues una cosa que t'hagi fet sentir trist o trista aquests últims dies.",
+  "Com et sents ara?",
+  "Si haguessis de descriure el teu estat d'ànim amb un color, quin color seria?",
+  "Quan t'enfades, quines reaccions tens?",
+  "Amb quines persones et sents segur o segura per explicar com et sents?",
+  "Quina emoció o sentiment és desagradable per a tu?",
+  "Quina emoció o sentiment és agradable per a tu?",
+  "Què et fa sentir frustració?",
+  "Què et fa sentir orgull de tu mateix o mateixa?",
+  "Si haguessis de descriure el teu estat d'ànim amb un instrument, quin instrument seria?",
+  "Si haguessis de descriure el teu estat d'ànim amb un paisatge, com seria?",
+  "Com et sents quan no t'escolten?",
+  "Què t'ajuda a expressar com et sents?",
+  "Què no t'ajuda a estar en calma i tranquil·litat?",
+  "Què t'ajuda a mantenir la calma i la tranquil·litat?",
+  "Quins pensaments es repeteixen al teu cap i et fan sentir malament?",
+  "Quines coses t'ajuden a sentir-te bé?",
+  "De quina manera t'agrada expressar com et sents? (ball, cant, dibuix…)",
+  "Quan estic trist o trista, m'agradaria que…"]}
+];
+
+/* ---------- Estat ---------- */
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-3);
+const build=raw=>raw.map(t=>({id:uid(),name:t.name,color:t.color,questions:t.qs.map(x=>({id:uid(),text:x}))}));
+const KEY='cercles.ruletes.v1';
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.wheels))return s}catch(e){}return null}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+
+const store=load()||{wheels:build(RAW),current:null,mode:'remove',method:'wheel'};
+if(!store.wheels.some(w=>w.id===store.current))store.current=store.wheels[0]?store.wheels[0].id:null;
+if(!['keep','remove','mark'].includes(store.mode))store.mode='remove';
+if(!['wheel','cards'].includes(store.method))store.method='wheel';
+delete store.dice;
+
+const used={}, order={};
+let lastPick=null, history=[], rot=0, busy=false;
+const reduceMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Utilitats ---------- */
+const $=s=>document.querySelector(s);
+function el(tag,attrs,...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs||{})){if(k==='class')e.className=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(v===true)e.setAttribute(k,'');else if(v!==false&&v!=null)e.setAttribute(k,v)}for(const k of kids.flat()){if(k==null)continue;e.append(k.nodeType?k:document.createTextNode(k))}return e}
+function mix(hex,amt){const n=parseInt(hex.slice(1),16);const f=c=>Math.round(c+(255-c)*amt);return `rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const cur=()=>store.wheels.find(w=>w.id===store.current)||null;
+const U=w=>used[w.id]||(used[w.id]=new Set());
+const isAvail=(w,q)=>store.mode==='keep'||!U(w).has(q.id);
+const candidates=w=>w.questions.filter(q=>isAvail(w,q));
+function segments(w){
+  if(store.mode==='remove')return w.questions.filter(q=>!U(w).has(q.id)||(lastPick&&lastPick.qid===q.id));
+  return w.questions;
+}
+const ICON_TRASH='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+const ICON_X='<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l8 8M11 3l-8 8"/></svg>';
+
+function askConfirm(o){
+  return new Promise(res=>{
+    const d=$('#ask'); $('#askTitle').textContent=o.title; $('#askText').textContent=o.text||'';
+    $('#askYes').textContent=o.yes||"D'acord"; $('#askYes').className='btn '+(o.danger?'destroy':'primary');
+    $('#askIcon').hidden=!o.danger;
+    const done=v=>{d.close();res(v)};
+    $('#askYes').onclick=()=>done(true); $('#askNo').onclick=()=>done(false);
+    d.oncancel=e=>{e.preventDefault();done(false)};
+    d.showModal(); $('#askNo').focus();
+  });
+}
+let toastT;
+function toast(text,action,fn){
+  const t=$('#toast'); t.innerHTML=''; t.append(el('span',{},text));
+  const hide=()=>t.classList.remove('show','has-action');
+  if(action){t.append(el('button',{type:'button',onclick:()=>{hide();clearTimeout(toastT);fn()}},action));t.classList.add('has-action')}
+  else t.classList.remove('has-action');
+  t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(hide,action?6000:2600);
+}
+
+/* Eliminar temàtica amb confirmació i desfer */
+async function deleteTheme(id){
+  if(busy)return; const w=store.wheels.find(x=>x.id===id); if(!w)return;
+  const n=w.questions.length;
+  const ok=await askConfirm({danger:true,title:`Eliminar «${w.name}»?`,
+    text:n?`S'esborraran les ${n===1?'1 pregunta':n+' preguntes'} d'aquesta temàtica.`:'Aquesta temàtica no té preguntes.',yes:'Elimina'});
+  if(!ok)return;
+  const idx=store.wheels.indexOf(w), wasCur=store.current===id, u=used[id];
+  store.wheels.splice(idx,1);
+  if(wasCur){const nx=store.wheels[Math.min(idx,store.wheels.length-1)];store.current=nx?nx.id:null;lastPick=null}
+  save(); if(dlg.open)dlg.close(); renderAll(); if(wasCur||!lastPick)idleCard();
+  toast(`S'ha eliminat «${w.name}».`,'Desfés',()=>{
+    store.wheels.splice(Math.min(idx,store.wheels.length),0,w); if(u)used[id]=u;
+    store.current=id; lastPick=null; save(); renderAll(); idleCard();
+  });
+}
+
+/* ---------- Ruleta ---------- */
+const cv=$('#wheel'), ctx=cv.getContext('2d');
+function sizeCanvas(){
+  const S=$('#wheelBox').clientWidth; if(!S)return;
+  const d=window.devicePixelRatio||1;
+  cv.width=Math.round(S*d); cv.height=Math.round(S*d);
+  ctx.setTransform(d,0,0,d,0,0); drawWheel();
+}
+function drawWheel(){
+  const S=cv.clientWidth; if(!S)return;
+  ctx.clearRect(0,0,S,S);
+  const w=cur(); const c=S/2, R=c-3;
+  const font=(wt,sz)=>`${wt} ${sz}px "IBM Plex Sans",system-ui,sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  const segs=w?segments(w):[]; const n=segs.length;
+  if(!n){
+    ctx.beginPath();ctx.arc(c,c,R,0,Math.PI*2);ctx.fillStyle='#ECE9E3';ctx.fill();
+    ctx.fillStyle='#9EA1A6';ctx.font=font(500,Math.max(12,S*.032));
+    ctx.fillText(w&&w.questions.length?'Totes les preguntes han sortit':'Encara no hi ha preguntes',c,c+R*.5);
+    return;
+  }
+  const s=Math.PI*2/n;
+  const fs=Math.max(10,Math.min(S*.052,S*.05*Math.pow(20/n,.4)));
+  segs.forEach((q,i)=>{
+    const a0=-Math.PI/2+rot+i*s, a1=a0+s;
+    const sel=!busy&&lastPick&&lastPick.qid===q.id;
+    const marked=!sel&&store.mode==='mark'&&U(w).has(q.id);
+    ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,R,a0,a1);ctx.closePath();
+    const qc=q.color||w.color;
+    ctx.fillStyle=sel?qc:marked?'#ECE9E3':mix(qc,i%2?.78:.88);ctx.fill();
+    ctx.strokeStyle='#F6F4EF';ctx.lineWidth=n>60?.6:1.6;ctx.stroke();
+    if(n<=72){
+      const m=(a0+a1)/2, rr=R*.83;
+      ctx.fillStyle=sel?'#fff':marked?'#BAB5AC':'rgba(30,34,39,.78)';
+      ctx.font=font(sel?600:500,fs);
+      ctx.fillText(String(w.questions.indexOf(q)+1),c+Math.cos(m)*rr,c+Math.sin(m)*rr);
+    }
+  });
+  ctx.beginPath();ctx.arc(c,c,R*.66,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=1;ctx.stroke();
+  ctx.beginPath();ctx.arc(c,c,R,0,Math.PI*2);ctx.strokeStyle='rgba(30,34,39,.16)';ctx.stroke();
+}
+function tick(){const p=$('#pointer');p.classList.remove('tick');void p.offsetWidth;p.classList.add('tick')}
+
+function spin(){
+  if(busy)return; const w=cur(); if(!w)return;
+  lastPick=null;
+  const cands=candidates(w);
+  if(!cands.length){drawWheel();notice(w.questions.length?'Totes les preguntes ja han sortit. Reinicia la ronda per tornar a començar.':'Aquesta temàtica encara no té preguntes. Obre l\'editor per afegir-ne.');return}
+  const pick=cands[Math.floor(Math.random()*cands.length)];
+  const segs=segments(w), n=segs.length, s=Math.PI*2/n, i=segs.indexOf(pick), TAU=Math.PI*2;
+  const target=-(i+.5+(Math.random()-.5)*.7)*s;
+  const delta=((target-rot)%TAU+TAU)%TAU;
+  const rm=reduceMotion(), turns=rm?1:5+Math.floor(Math.random()*3);
+  const from=rot, to=rot+delta+turns*TAU, dur=rm?900:4300+Math.random()*900, t0=performance.now();
+  let lastIdx=-1; setBusy(true); pending('La ruleta està girant…');
+  function frame(t){
+    const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,4);
+    rot=from+(to-from)*e; drawWheel();
+    const idx=Math.floor((((-rot)%TAU+TAU)%TAU)/s);
+    if(idx!==lastIdx){lastIdx=idx;if(!rm)tick()}
+    if(p<1)requestAnimationFrame(frame);
+    else{rot=((to%TAU)+TAU)%TAU;setBusy(false);choose(w,pick,'Ruleta')}
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Targetes ---------- */
+function cardOrder(w){
+  const ids=w.questions.map(q=>q.id); let o=order[w.id];
+  if(!o||o.length!==ids.length||o.some(id=>!ids.includes(id)))o=order[w.id]=shuffle(ids.slice());
+  return o;
+}
+function renderCards(){
+  if(store.method!=='cards')return;
+  const grid=$('#cards'); grid.innerHTML=''; const w=cur(); if(!w)return;
+  if(!w.questions.length){grid.append(el('p',{class:'empty-q'},'Aquesta temàtica encara no té preguntes.'));return}
+  cardOrder(w).forEach(id=>{
+    const q=w.questions.find(x=>x.id===id), num=w.questions.indexOf(q)+1;
+    const isLast=lastPick&&lastPick.qid===id, done=store.mode!=='keep'&&U(w).has(id);
+    if(store.mode==='remove'&&done&&!isLast){grid.append(el('div',{class:'card gone','aria-hidden':'true'}));return}
+    const flipped=isLast||(store.mode==='mark'&&done);
+    grid.append(el('button',{
+      class:'card'+(flipped?' flipped':'')+(isLast?' current':'')+(done&&!isLast?' done':''),
+      disabled:done, 'aria-label':flipped?'Pregunta '+num:'Targeta tapada',
+      onclick:()=>{if(!busy)choose(w,q,'Targeta')}
+    },el('span',{class:'card-inner'},el('span',{class:'card-back'}),el('span',{class:'card-front'},String(num)))));
+  });
+}
+
+/* ---------- Tria i resultat ---------- */
+function pickByNumber(num,via){
+  const w=cur(); if(!w)return;
+  const q=w.questions[num-1];
+  if(!q){notice(`No hi ha cap pregunta ${num}: aquesta temàtica en té ${w.questions.length}.`);return}
+  if(!isAvail(w,q)){notice(`La pregunta ${num} ja ha sortit en aquesta ronda. Torneu-ho a provar.`);return}
+  choose(w,q,via);
+}
+function choose(w,q,via){
+  if(store.mode!=='keep')U(w).add(q.id);
+  lastPick={wid:w.id,qid:q.id};
+  const num=w.questions.indexOf(q)+1;
+  showQuestion(w,num,q);
+  history.unshift({theme:q.src||w.name,color:q.color||w.color,num,text:q.text,via});
+  renderHistory(); renderInfo(); drawWheel(); renderCards();
+}
+function setCard(metaNodes,text,cls){
+  const card=$('#qcard'),meta=$('#qmeta'),t=$('#qtext');
+  meta.innerHTML=''; (metaNodes||[]).forEach(n=>meta.append(n));
+  t.className='qtext'+(cls?' '+cls:''); t.textContent=text;
+  card.classList.remove('reveal'); void card.offsetWidth; card.classList.add('reveal');
+}
+function showQuestion(w,num,q){setCard([el('span',{class:'qnum',style:q.color?'color:'+q.color:null},String(num)),el('span',{},q.src?`${w.name} · ${q.src}`:w.name)],q.text)}
+function notice(text){setCard([el('span',{},'Avís')],text,'notice')}
+function pending(text){setCard([el('span',{},cur()?cur().name:'')],text,'placeholder')}
+function idleCard(){
+  const w=cur();
+  const msg={wheel:'Gira la ruleta per començar el cercle.',cards:'Tria una targeta per començar el cercle.'}[store.method];
+  setCard([el('span',{},w?w.name:'')],w?msg:'Crea una temàtica per començar.','placeholder');
+}
+
+function setBusy(b){
+  busy=b; $('#spinBtn').disabled=b; $('#btnList').disabled=b;
+  document.querySelectorAll('#methodSeg button,#modeOpts button,.theme-btn,.theme-del,#btnSession').forEach(x=>x.disabled=b);
+}
+
+/* ---------- Render general ---------- */
+function applyTheme(){
+  const w=cur(), c=w?w.color:'#3E6E8E', r=document.documentElement.style;
+  r.setProperty('--theme',c); r.setProperty('--theme-soft',mix(c,.86));
+}
+function renderThemes(){
+  const ul=$('#themeList'); ul.innerHTML='';
+  store.wheels.forEach(w=>{
+    const del=el('button',{class:'theme-del',title:'Eliminar temàtica','aria-label':'Eliminar '+w.name,onclick:e=>{e.stopPropagation();deleteTheme(w.id)}});
+    del.innerHTML=ICON_TRASH;
+    ul.append(el('li',{},el('button',{class:'theme-btn'+(w.id===store.current?' active':''),onclick:()=>selectTheme(w.id)},
+      el('span',{class:'dot'+(w.session?' ring':''),style:'background:'+w.color}),el('span',{class:'nm'},w.name),el('span',{class:'ct'},String(w.questions.length))),del));
+  });
+}
+function renderInfo(){
+  const w=cur();
+  $('#themeTitle').textContent=w?w.name:'Sense temàtiques';
+  $('#eyebrow').textContent=w&&w.session?'Preguntes triades per a avui':'Temàtica'+(store.wheels.length>1&&w?` ${store.wheels.indexOf(w)+1} de ${store.wheels.length}`:'');
+  $('#btnExportOne').disabled=!w;
+  $('#btnExportOne').textContent=w?`Exportar només «${w.name}»`:'Exportar només la temàtica actual';
+  if(!w){$('#poolInfo').textContent='';return}
+  const t=w.questions.length;
+  $('#poolInfo').textContent=store.mode==='keep'?`${t} preguntes`:`${candidates(w).length} de ${t} disponibles`;
+  $('#numInput').placeholder=t?`1–${t}`:'—';
+  $('#btnEdit').disabled=$('#btnReset').disabled=false;
+}
+function renderControls(){
+  document.querySelectorAll('#methodSeg button').forEach(b=>b.classList.toggle('active',b.dataset.m===store.method));
+  document.querySelectorAll('#modeOpts .opt').forEach(b=>b.classList.toggle('active',b.dataset.mode===store.mode));
+  $('#wheelView').hidden=store.method!=='wheel';
+  $('#cardsView').hidden=store.method!=='cards';
+}
+function renderHistory(){
+  const ol=$('#history'); ol.innerHTML='';
+  if(!history.length){ol.append(el('li',{class:'empty'},'Encara no ha sortit cap pregunta.'));return}
+  history.forEach(h=>ol.append(el('li',{},el('span',{class:'hn',style:'color:'+h.color},String(h.num)),
+    el('span',{},el('span',{class:'ht'},h.theme),h.text))));
+}
+function renderAll(){
+  applyTheme(); renderThemes(); renderControls(); renderInfo();
+  if(store.method==='wheel')sizeCanvas();
+  renderCards();
+}
+
+function selectTheme(id){
+  if(busy)return; store.current=id; lastPick=null; save(); renderAll(); idleCard();
+}
+
+/* ---------- Editor ---------- */
+const dlg=$('#editor');
+function autoH(t){t.style.height='auto';t.style.height=t.scrollHeight+'px'}
+function renderEditor(){
+  const w=cur(); if(!w)return;
+  $('#edName').value=w.name;
+  const sw=$('#swatches'); sw.innerHTML='';
+  PALETTE.forEach(c=>sw.append(el('button',{class:'sw'+(c===w.color?' active':''),style:'background:'+c,'aria-label':'Color '+c,onclick:()=>{w.color=c;save();renderEditor();renderAll()}})));
+  $('#edCount').textContent=w.questions.length===1?'1 pregunta':`${w.questions.length} preguntes`;
+  const list=$('#qList'); list.innerHTML='';
+  if(!w.questions.length)list.append(el('p',{class:'empty-q',style:'margin-left:38px'},'Encara no hi ha preguntes.'));
+  w.questions.forEach((q,i)=>{
+    const ta=el('textarea',{rows:'1','aria-label':'Pregunta '+(i+1)});
+    ta.value=q.text;
+    ta.addEventListener('input',()=>{q.text=ta.value;autoH(ta);save()});
+    const del=el('button',{class:'icon-btn',title:'Eliminar pregunta','aria-label':'Eliminar pregunta '+(i+1),onclick:()=>{
+      w.questions.splice(w.questions.indexOf(q),1);U(w).delete(q.id);if(lastPick&&lastPick.qid===q.id)lastPick=null;save();renderEditor();renderAll();
+    }});
+    del.innerHTML=ICON_X;
+    list.append(el('div',{class:'q-row'},el('span',{class:'n'},String(i+1)),ta,del));
+  });
+  requestAnimationFrame(()=>list.querySelectorAll('textarea').forEach(autoH));
+}
+function openEditor(focusName){
+  if(!cur()||busy)return; renderEditor(); dlg.showModal();
+  if(focusName){const i=$('#edName');i.focus();i.select()}
+}
+function closeEditor(){
+  const w=cur();
+  if(w){
+    w.questions=w.questions.filter(q=>q.text.trim());
+    w.questions.forEach(q=>q.text=q.text.trim());
+    if(!w.name.trim())w.name='Sense títol';
+    save();
+  }
+  if(dlg.open)dlg.close();
+  renderAll(); if(!lastPick)idleCard();
+}
+$('#edName').addEventListener('input',e=>{const w=cur();w.name=e.target.value;save();renderThemes();renderInfo()});
+$('#addQ').addEventListener('click',()=>{
+  const w=cur();w.questions.push({id:uid(),text:''});save();renderEditor();renderAll();
+  requestAnimationFrame(()=>{const t=[...document.querySelectorAll('#qList textarea')].pop();if(t){t.focus();t.scrollIntoView({block:'nearest'})}});
+});
+$('#bulkAdd').addEventListener('click',()=>{
+  const w=cur(), lines=$('#bulkText').value.split(/\r?\n/).map(s=>s.replace(/^\s*\d+[\.\)\-–]\s*/,'').trim()).filter(Boolean);
+  if(!lines.length)return;
+  lines.forEach(t=>w.questions.push({id:uid(),text:t}));
+  $('#bulkText').value=''; save(); renderEditor(); renderAll();
+});
+$('#delTheme').addEventListener('click',()=>{const w=cur();if(w)deleteTheme(w.id)});
+$('#dupTheme').addEventListener('click',()=>{
+  const w=cur(); if(!w)return;
+  const copy={id:uid(),name:w.name+' (còpia)',color:w.color,questions:w.questions.filter(q=>q.text.trim()).map(q=>({id:uid(),text:q.text,src:q.src,color:q.color}))};
+  store.wheels.splice(store.wheels.indexOf(w)+1,0,copy); store.current=copy.id; lastPick=null;
+  save(); renderEditor(); renderAll(); $('#edName').focus(); $('#edName').select();
+});
+$('#expTheme').addEventListener('click',()=>{const w=cur();if(w)exportOne(w)});
+$('#closeEd').addEventListener('click',closeEditor);
+dlg.addEventListener('cancel',e=>{e.preventDefault();closeEditor()});
+dlg.addEventListener('click',e=>{if(e.target===dlg)closeEditor()});
+
+/* ---------- Esdeveniments ---------- */
+$('#spinBtn').addEventListener('click',spin);
+$('#shuffleBtn').addEventListener('click',()=>{const w=cur();if(!w||busy)return;order[w.id]=null;if(store.mode==='keep')lastPick=null;renderCards()});
+$('#addTheme').addEventListener('click',()=>{
+  if(busy)return;
+  const used=store.wheels.map(w=>w.color), color=PALETTE.find(c=>!used.includes(c))||PALETTE[store.wheels.length%PALETTE.length];
+  const w={id:uid(),name:'Nova temàtica',color,questions:[]};
+  store.wheels.push(w); store.current=w.id; lastPick=null; save(); renderAll(); idleCard(); openEditor(true);
+});
+$('#btnEdit').addEventListener('click',()=>openEditor(false));
+$('#btnReset').addEventListener('click',()=>{
+  const w=cur(); if(!w||busy)return;
+  used[w.id]=new Set(); order[w.id]=null; lastPick=null; renderAll(); idleCard();
+});
+document.querySelectorAll('#methodSeg button').forEach(b=>b.addEventListener('click',()=>{
+  store.method=b.dataset.m; save(); renderAll(); if(!lastPick)idleCard();
+}));
+document.querySelectorAll('#modeOpts .opt').forEach(b=>b.addEventListener('click',()=>{
+  store.mode=b.dataset.mode; save(); renderAll();
+}));
+function pickTyped(){
+  if(busy)return; const inp=$('#numInput');
+  const v=parseInt(inp.value.replace(/\D/g,''),10);
+  if(!v){inp.focus();notice('Escriu un número per mostrar-ne la pregunta.');return}
+  lastPick=null; pickByNumber(v,'Número'); inp.value=''; inp.focus();
+}
+$('#numBtn').addEventListener('click',pickTyped);
+
+/* ---------- Preparar sessió ---------- */
+const sesDlg=$('#sesDlg');
+let sel=[], chipsOn=new Set();
+const sources=()=>store.wheels.filter(w=>!w.session);
+const keyOf=(w,q)=>w.id+'|'+q.id;
+function findRef(k){const[wid,qid]=k.split('|');const w=store.wheels.find(x=>x.id===wid);const q=w&&w.questions.find(x=>x.id===qid);return w&&q?{w,q}:null}
+function renderSession(){
+  const body=$('#sesBody'); body.innerHTML='';
+  const f=norm($('#sesSearch').value.trim());
+  let any=false;
+  sources().filter(w=>chipsOn.has(w.id)).forEach(w=>{
+    const qs=w.questions.filter(q=>q.text.trim()&&(!f||norm(q.text).includes(f)));
+    if(!qs.length)return; any=true;
+    const nSel=w.questions.filter(q=>sel.includes(keyOf(w,q))).length;
+    const allOn=qs.every(q=>sel.includes(keyOf(w,q)));
+    const g=el('div',{class:'ses-group'},
+      el('div',{class:'ses-gh'},el('span',{class:'dot',style:'background:'+w.color}),el('b',{},w.name),
+        el('small',{},nSel?`${nSel} triades`:''),
+        el('button',{class:'link',onclick:()=>{
+          qs.forEach(q=>{const k=keyOf(w,q),i=sel.indexOf(k);if(allOn){if(i>=0)sel.splice(i,1)}else if(i<0)sel.push(k)});renderSession()
+        }},allOn?'Treu-les':'Tria-les totes')));
+    qs.forEach(q=>{
+      const k=keyOf(w,q), pos=sel.indexOf(k);
+      const cb=el('input',{type:'checkbox','aria-label':q.text}); cb.checked=pos>=0;
+      cb.addEventListener('change',()=>{const i=sel.indexOf(k);if(cb.checked&&i<0)sel.push(k);else if(!cb.checked&&i>=0)sel.splice(i,1);renderSession()});
+      g.append(el('label',{class:'ses-row'+(pos>=0?' sel':'')},cb,el('span',{},q.text),el('span',{class:'ord',style:'color:'+w.color},pos>=0?String(pos+1):'')));
+    });
+    body.append(g);
+  });
+  if(!any)body.append(el('p',{class:'empty-q',style:'padding-left:12px'},!chipsOn.size?'Activa almenys una temàtica per veure\'n les preguntes.':f?'Cap pregunta coincideix amb la cerca.':'No hi ha preguntes carregades.'));
+  const n=sel.length;
+  $('#sesInfo').innerHTML=''; $('#sesInfo').append(el('b',{},String(n)),n===1?' pregunta triada':' preguntes triades');
+  $('#sesGo').disabled=!n; $('#sesGo').textContent=n?`Comença la sessió (${n})`:'Comença la sessió';
+}
+function renderChips(){
+  const box=$('#sesChips'); box.innerHTML='';
+  sources().forEach(w=>box.append(el('button',{class:'chip'+(chipsOn.has(w.id)?' on':''),onclick:()=>{chipsOn.has(w.id)?chipsOn.delete(w.id):chipsOn.add(w.id);renderChips();renderSession()}},
+    el('span',{class:'dot',style:'background:'+w.color}),w.name)));
+}
+function openSession(){
+  if(busy)return;
+  const cs=store.wheels.find(w=>w.session);
+  sel=cs?cs.questions.map(q=>q.ref).filter(k=>k&&findRef(k)):[];
+  chipsOn=new Set(sources().map(w=>w.id));
+  $('#sesSearch').value=''; renderChips(); renderSession(); sesDlg.showModal(); $('#sesSearch').focus();
+}
+$('#btnSession').addEventListener('click',openSession);
+$('#sesSearch').addEventListener('input',renderSession);
+$('#sesCancel').addEventListener('click',()=>sesDlg.close());
+sesDlg.addEventListener('click',e=>{if(e.target===sesDlg)sesDlg.close()});
+$('#sesClear').addEventListener('click',()=>{sel=[];renderSession()});
+$('#sesRandom').addEventListener('click',()=>{
+  const n=Math.max(1,parseInt($('#sesN').value,10)||1);
+  const pool=[];
+  sources().filter(w=>chipsOn.has(w.id)).forEach(w=>w.questions.forEach(q=>{const k=keyOf(w,q);if(q.text.trim()&&!sel.includes(k))pool.push(k)}));
+  if(!chipsOn.size){toast('Tria almenys una temàtica per sortejar.');return}
+  if(!pool.length){toast('Ja estan totes triades.');return}
+  const got=shuffle(pool).slice(0,n); sel.push(...got); renderSession();
+  if(got.length<n)toast(`Només n'hi havia ${got.length} de disponibles.`);
+});
+$('#sesGo').addEventListener('click',()=>{
+  if(!sel.length)return;
+  const qs=sel.map(findRef).filter(Boolean).map(({w,q})=>({id:uid(),text:q.text,src:w.name,color:w.color,ref:keyOf(w,q)}));
+  let s=store.wheels.find(w=>w.session);
+  if(s){s.questions=qs;used[s.id]=new Set();order[s.id]=null}
+  else{s={id:uid(),name:'Sessió',color:'#1E2227',session:true,questions:qs};store.wheels.unshift(s)}
+  store.current=s.id; lastPick=null; save(); sesDlg.close(); renderAll(); idleCard();
+  toast(`Sessió preparada amb ${qs.length} ${qs.length===1?'pregunta':'preguntes'}.`);
+});
+
+/* Llista de preguntes (tria manual) */
+const lstDlg=$('#listDlg');
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+function renderList(){
+  const w=cur(), ul=$('#lst'); ul.innerHTML=''; if(!w)return;
+  $('#lstTitle').textContent=w.name;
+  const t=w.questions.length;
+  $('#lstInfo').textContent=store.mode==='keep'?`${t} preguntes`:`${candidates(w).length} de ${t} disponibles`;
+  const f=norm($('#lstSearch').value.trim());
+  let shown=0;
+  w.questions.forEach((q,i)=>{
+    const num=i+1;
+    if(f&&!(String(num)===f||norm(q.text).includes(f)))return;
+    const avail=isAvail(w,q), isLast=lastPick&&lastPick.qid===q.id;
+    shown++;
+    ul.append(el('li',{},el('button',{
+      class:'lst-item'+(isLast?' current':''), disabled:!avail,
+      onclick:()=>{lastPick=null;choose(w,q,'Llista');lstDlg.close()}
+    },el('span',{class:'lst-n'},String(num)),el('span',{class:'lst-t'},q.text),
+      el('span',{class:'lst-tag',style:q.color&&avail&&!isLast?'color:'+q.color:null},isLast?'Actual':!avail?'Ja ha sortit':(q.src||'')))));
+  });
+  if(!t)ul.append(el('li',{class:'empty-q',style:'padding-left:12px'},'Aquesta temàtica encara no té preguntes.'));
+  else if(!shown)ul.append(el('li',{class:'empty-q',style:'padding-left:12px'},'Cap pregunta coincideix amb la cerca.'));
+}
+function openList(){
+  if(busy||!cur())return;
+  $('#lstSearch').value=''; renderList(); lstDlg.showModal();
+  const c=lstDlg.querySelector('.lst-item.current'); if(c)c.scrollIntoView({block:'center'});
+  $('#lstSearch').focus();
+}
+$('#btnList').addEventListener('click',openList);
+$('#lstClose').addEventListener('click',()=>lstDlg.close());
+$('#lstSearch').addEventListener('input',renderList);
+$('#lstSearch').addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return; e.preventDefault();
+  const v=e.target.value.trim(), w=cur();
+  if(/^\d+$/.test(v)&&w){const q=w.questions[+v-1];if(q&&isAvail(w,q)){lastPick=null;choose(w,q,'Llista');lstDlg.close()}return}
+  const b=lstDlg.querySelector('.lst-item:not(:disabled)');if(b)b.click();
+});
+lstDlg.addEventListener('click',e=>{if(e.target===lstDlg)lstDlg.close()});
+$('#numInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();pickTyped()}});
+$('#clearHist').addEventListener('click',()=>{if(!history.length){toast('L\'historial ja és buit.');return}history=[];renderHistory();toast('Historial netejat.')});
+
+$('#btnPresent').addEventListener('click',togglePresent);
+function togglePresent(){
+  const on=document.body.classList.toggle('present');
+  $('#btnPresent').textContent=on?'Sortir de la projecció':'Mode projecció';
+  try{
+    if(on&&document.documentElement.requestFullscreen&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+    if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{});
+  }catch(e){}
+  setTimeout(sizeCanvas,60);
+}
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('present'))togglePresent()});
+
+document.addEventListener('keydown',e=>{
+  if(dlg.open||$('#ask').open||$('#listDlg').open||$('#sesDlg').open||$('#dupDlg').open)return;
+  if(e.key==='Escape'&&!$('#notePanel').hidden){toggleNote(false);$('#noteFab').focus();return}
+  const tag=(e.target.tagName||'').toLowerCase();
+  if(['input','textarea','select'].includes(tag))return;
+  if(e.code==='Space'||e.key===' '){
+    if(tag==='button'&&e.target.id!=='spinBtn')return;
+    e.preventDefault();
+    if(store.method==='wheel')spin();
+  }
+  if((e.key==='l'||e.key==='L')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openList()}
+  if(e.key==='Escape'&&document.body.classList.contains('present'))togglePresent();
+});
+
+/* Dades */
+function download(wheels,file){
+  const data={app:'cercles',version:1,wheels:wheels.map(w=>({name:w.name,color:w.color,questions:w.questions.map(q=>q.text)}))};
+  const a=el('a',{href:URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),download:file});
+  document.body.append(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+}
+const slug=s=>norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'tematica';
+function exportOne(w){download([w],`cercles-${slug(w.name)}.json`);toast(`S'ha exportat «${w.name}».`)}
+$('#btnExport').addEventListener('click',()=>download(store.wheels,'cercles-ruletes.json'));
+$('#btnExportOne').addEventListener('click',()=>{const w=cur();if(w)exportOne(w)});
+$('#btnImport').addEventListener('click',()=>$('#fileImport').click());
+
+/* Temàtiques importades amb el mateix nom que una d'existent: conservar, substituir o tenir-les totes dues */
+const sameName=(a,b)=>norm(a.trim())===norm(b.trim());
+function askConflicts(clashes){
+  return new Promise(res=>{
+    const d=$('#dupDlg'), list=$('#dupList'), choice=clashes.map(()=>'keep');
+    const n=clashes.length;
+    $('#dupTitle').textContent=n===1?`Ja tens una temàtica que es diu «${clashes[0].t.name}»`:`Ja tens ${n} temàtiques amb el mateix nom`;
+    $('#dupAll').hidden=n<2;
+    const OPTS=[['keep','Conserva la meva'],['replace','Substitueix-la'],['both','Conserva les dues']];
+    const render=()=>{
+      list.innerHTML='';
+      clashes.forEach(({t,w},i)=>{
+        const seg=el('div',{class:'segmented',role:'group','aria-label':'Què vols fer amb '+t.name},
+          OPTS.map(([v,txt])=>el('button',{type:'button',class:choice[i]===v?'active':'','aria-pressed':String(choice[i]===v),onclick:()=>{choice[i]=v;render()}},txt)));
+        list.append(el('li',{class:'dup-item'},
+          el('div',{class:'dup-name'},el('span',{class:'dot',style:'background:'+w.color}),t.name,
+            el('small',{},`ara ${w.questions.length} · fitxer ${t.questions.length} preguntes`)),seg));
+      });
+    };
+    d.querySelectorAll('#dupAll button').forEach(b=>b.onclick=()=>{choice.fill(b.dataset.all);render()});
+    const done=v=>{d.close();res(v)};
+    $('#dupYes').onclick=()=>done(choice); $('#dupNo').onclick=()=>done(null);
+    d.oncancel=e=>{e.preventDefault();done(null)};
+    render(); d.showModal(); $('#dupYes').focus();
+  });
+}
+function freeName(name){
+  let n=`${name} (importada)`, i=2;
+  while(store.wheels.some(w=>sameName(w.name,n)))n=`${name} (importada ${i++})`;
+  return n;
+}
+function parseImport(text){
+  const d=JSON.parse(text), arr=Array.isArray(d)?d:d&&d.wheels;
+  if(!Array.isArray(arr))throw 0;
+  const out=arr.filter(t=>t&&t.name&&Array.isArray(t.questions)).map((t,i)=>({
+    id:uid(),name:String(t.name).trim()||'Sense títol',
+    color:/^#[0-9a-f]{6}$/i.test(t.color)?t.color:PALETTE[(store.wheels.length+i)%PALETTE.length],
+    questions:t.questions.map(q=>typeof q==='string'?q:q&&q.text).filter(x=>x&&String(x).trim()).map(x=>({id:uid(),text:String(x).trim()}))
+  }));
+  if(!out.length)throw 0;
+  return out;
+}
+async function importWheels(incoming){
+  const clashes=incoming.map(t=>({t,w:store.wheels.find(w=>!w.session&&sameName(w.name,t.name))})).filter(x=>x.w);
+  let choice=[];
+  if(clashes.length){choice=await askConflicts(clashes);if(!choice)return}
+  const act=new Map(clashes.map((c,i)=>[c.t,{w:c.w,how:choice[i]}]));
+  let added=0, replaced=0, kept=0, first=null;
+  incoming.forEach(t=>{
+    const c=act.get(t);
+    if(c&&c.how==='keep'){kept++;return}
+    if(c&&c.how==='replace'){
+      Object.assign(c.w,{name:t.name,color:t.color,questions:t.questions});
+      used[c.w.id]=new Set(); order[c.w.id]=null; replaced++; first=first||c.w.id; return;
+    }
+    if(c)t.name=freeName(t.name);
+    store.wheels.push(t); added++; first=first||t.id;
+  });
+  if(!first){toast('No s\'ha importat res: has conservat les temàtiques que ja tenies.');return}
+  store.current=first; lastPick=null; save(); renderAll(); idleCard();
+  const parts=[];
+  if(added)parts.push(`${added} ${added===1?'afegida':'afegides'}`);
+  if(replaced)parts.push(`${replaced} ${replaced===1?'substituïda':'substituïdes'}`);
+  if(kept)parts.push(`${kept} ${kept===1?'conservada':'conservades'} sense canvis`);
+  toast(`Importació feta: ${parts.join(', ')}.`);
+}
+$('#fileImport').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    e.target.value='';
+    let incoming;
+    try{incoming=parseImport(r.result)}
+    catch(err){toast('No s\'ha pogut llegir el fitxer. Ha de ser un .json exportat des d\'aquesta aplicació.');return}
+    importWheels(incoming);
+  };
+  r.readAsText(f);
+});
+
+/* Avís flotant: on es desen les dades */
+const NOTE_KEY='cercles.avis.vist';
+function toggleNote(open){
+  const p=$('#notePanel'), fab=$('#noteFab');
+  p.hidden=!open; fab.setAttribute('aria-expanded',String(open));
+  if(open){fab.classList.remove('unseen');try{localStorage.setItem(NOTE_KEY,'1')}catch(e){}}
+}
+try{if(!localStorage.getItem(NOTE_KEY))$('#noteFab').classList.add('unseen')}catch(e){}
+$('#noteFab').addEventListener('click',()=>toggleNote($('#notePanel').hidden));
+$('#noteClose').addEventListener('click',()=>{toggleNote(false);$('#noteFab').focus()});
+$('#noteExport').addEventListener('click',()=>{toggleNote(false);$('#btnExport').click()});
+$('#noteImport').addEventListener('click',()=>{toggleNote(false);$('#btnImport').click()});
+document.addEventListener('click',e=>{if(!$('#notePanel').hidden&&!$('#storeNote').contains(e.target))toggleNote(false)});
+$('#btnRestore').addEventListener('click',async()=>{
+  if(busy)return;
+  if(!await askConfirm({danger:true,title:'Restaurar les ruletes originals?',text:'Es substituiran totes les temàtiques actuals per les cinc ruletes originals.',yes:'Restaura'}))return;
+  store.wheels=build(RAW); store.current=store.wheels[0].id;
+  for(const k in used)delete used[k]; for(const k in order)delete order[k];
+  lastPick=null; history=[]; save(); renderAll(); renderHistory(); idleCard(); toast('Ruletes originals restaurades.');
+});
+
+let rz; window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(sizeCanvas,80)});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawWheel);
+
+renderAll(); renderHistory(); idleCard();
+})();
+</script>
+</body>
+</html>
